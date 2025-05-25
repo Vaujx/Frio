@@ -126,88 +126,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
             async function scrapeWebsiteForVideos(url) {
                 try {
-                    showStatus(`Attempting to scrape ${url} for videos...`, 'info');
-                    updateProgress(10);
+                    showStatus(`Requesting server to scrape ${url}...`, 'info');
+                    updateProgress(10); // Initial progress
 
-                    // Try to fetch with no-cors mode for some cases
-                    let response = null;
-                    let html = '';
-                    
-                    try {
-                        // First try normal fetch
-                        response = await fetch(url, {
-                            method: 'GET',
-                            mode: 'cors'
-                        });
-                        
-                        if (response.ok) {
-                            html = await response.text();
-                            updateProgress(50);
-                        }
-                    } catch (corsError) {
-                        // If CORS fails, try no-cors (limited functionality)
-                        try {
-                            response = await fetch(url, {
-                                method: 'GET',
-                                mode: 'no-cors'
-                            });
-                            showStatus('Limited scraping due to CORS restrictions - trying alternative methods', 'info');
-                        } catch (noCorsError) {
-                            throw new Error('Cannot access website due to CORS policy');
-                        }
-                    }
-
-                    if (!html) {
-                        // If we can't get HTML content, provide helpful alternatives
-                        showStatus('Cannot directly scrape due to CORS policy. Try these alternatives:', 'error');
-                        return provideScrapingAlternatives(url);
-                    }
-
-                    const foundVideos = [];
-                    
-                    // Extract videos using various patterns
-                    advancedVideoPatterns.forEach(pattern => {
-                        let match;
-                        pattern.lastIndex = 0; // Reset regex state
-                        while ((match = pattern.exec(html)) !== null) {
-                            const videoUrl = match[1] || match[0];
-                            if (isValidUrl(videoUrl) && !foundVideos.includes(videoUrl)) {
-                                foundVideos.push(videoUrl);
-                            }
-                        }
+                    // Make a POST request to the backend /scrape endpoint
+                    const response = await fetch('http://localhost:3000/scrape', { // Assuming backend runs on port 3000
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: url }),
                     });
 
-                    // Extract from video tags
-                    const videoTagPattern = /<video[^>]*>[\s\S]*?<\/video>/gi;
-                    const srcPattern = /src\s*=\s*["']([^"']+)/gi;
-                    
-                    let videoMatch;
-                    while ((videoMatch = videoTagPattern.exec(html)) !== null) {
-                        let srcMatch;
-                        srcPattern.lastIndex = 0; // Reset regex state
-                        while ((srcMatch = srcPattern.exec(videoMatch[0])) !== null) {
-                            const videoUrl = srcMatch[1];
-                            if (isValidUrl(videoUrl) && !foundVideos.includes(videoUrl)) {
-                                foundVideos.push(videoUrl);
-                            }
-                        }
+                    updateProgress(50); // Progress after fetch call initiated
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ error: 'Unknown error from server' }));
+                        throw new Error(`Server error: ${response.status} ${response.statusText}. ${errorData.error || ''}`);
                     }
 
-                    updateProgress(100);
-                    
+                    const data = await response.json();
+                    const foundVideos = data.videos || [];
+
+                    updateProgress(100); // Progress after receiving data
+
                     if (foundVideos.length > 0) {
-                        showStatus(`Successfully found ${foundVideos.length} videos!`, 'success');
+                        showStatus(`Server successfully found ${foundVideos.length} videos!`, 'success');
                     } else {
-                        showStatus('No videos found in the scraped content', 'error');
-                        return provideScrapingAlternatives(url);
+                        showStatus('Server found no videos on the page.', 'info');
+                        // Consider keeping or adapting provideScrapingAlternatives(url) if the server returns specific suggestions or if it's a general fallback.
+                        // For now, we'll rely on the server's findings.
+                        // return provideScrapingAlternatives(url); // Fallback if server finds nothing - can be uncommented if desired
                     }
                     
                     return foundVideos;
 
                 } catch (error) {
-                    showStatus(`Scraping failed: ${error.message}`, 'error');
+                    console.error('Frontend Scraping error:', error);
+                    showStatus(`Scraping failed: ${error.message}. Make sure the backend server is running.`, 'error');
                     updateProgress(0);
-                    return provideScrapingAlternatives(url);
+                    // provideScrapingAlternatives(url) might still be useful here as a fallback.
+                    // For now, returning an empty array on error.
+                    return []; 
                 }
             }
 
@@ -410,8 +370,13 @@ URL: ${url}`;
                 a.href = url;
                 
                 let filename = url.substring(url.lastIndexOf('/') + 1);
+                // A simple improvement: ensure filename doesn't start with query parameters
+                if (filename.includes('?')) {
+                    filename = filename.substring(0, filename.indexOf('?'));
+                }
+                // If filename is empty after stripping query params (e.g. url ends with '/?query'), or no extension
                 if (!filename || !filename.includes('.')) {
-                    const format = getVideoFormat(url);
+                    const format = getVideoFormat(url); // getVideoFormat is an existing utility
                     filename = `video_${Date.now()}.${format === 'unknown' ? 'mp4' : format}`;
                 }
                 
@@ -483,15 +448,20 @@ URL: ${url}`;
                         });
 
                         if (addedCount === 0) {
-                            showStatus('No valid video URLs were found', 'error');
+                            // This means server might have found videos, but none were valid by client-side checks or new (not already in list)
+                            showStatus('Server found video links, but none were new or valid enough to be added.', 'info');
                         } else {
-                            showStatus(`Successfully added ${addedCount} videos from scraping`, 'success');
+                            showStatus(`Successfully added ${addedCount} new videos from scraping`, 'success');
                         }
-                    } else {
-                        showStatus('No videos found. Try manual inspection or direct video URLs.', 'error');
+                    } else { 
+                        // videos is an empty array, meaning scrapeWebsiteForVideos found nothing OR errored internally and returned [].
+                        // scrapeWebsiteForVideos function already shows a status message like "Server found no videos on the page." or an error message.
+                        // This message is for the case where the overall scraping process initiated by the button resulted in no videos being added.
+                        showStatus('Scraping process completed, but no new videos were added to your list.', 'info');
                     }
                 } catch (error) {
-                    showStatus(`Scraping error: ${error.message}`, 'error');
+                    // This catch block in the event listener is a fallback for unexpected errors from scrapeWebsiteForVideos if it doesn't catch everything.
+                    showStatus(`An unexpected error occurred during scraping: ${error.message}`, 'error');
                 } finally {
                     // Re-enable button
                     scrapeButton.disabled = false;
