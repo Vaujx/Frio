@@ -1,373 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Video Downloader</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-
-        .input-section {
-            padding: 30px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .input-field {
-            flex: 1;
-            min-width: 300px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            padding: 15px 25px;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: #f8f9fa;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c82333;
-            transform: translateY(-2px);
-        }
-
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-            font-size: 14px;
-            padding: 8px 12px;
-        }
-
-        .options-section {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .status-section {
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .status-message {
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .status-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .status-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .video-list-section {
-            padding: 30px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-            flex-wrap: wrap;
-        }
-
-        .table-container {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-        }
-
-        th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid #f0f0f0;
-            vertical-align: middle;
-        }
-
-        tr:hover {
-            background: #f8f9ff;
-        }
-
-        .url-cell {
-            max-width: 300px;
-            word-break: break-all;
-            font-family: monospace;
-            font-size: 13px;
-        }
-
-        .video-format {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .format-mp4 { background: #e3f2fd; color: #1976d2; }
-        .format-m3u8 { background: #f3e5f5; color: #7b1fa2; }
-        .format-webm { background: #e8f5e8; color: #388e3c; }
-        .format-mov { background: #fff3e0; color: #f57c00; }
-        .format-unknown { background: #f5f5f5; color: #616161; }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #f0f0f0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .scraped-info {
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 5px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .input-group {
-                flex-direction: column;
-            }
-            
-            .input-field {
-                min-width: auto;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎥 Enhanced Video Downloader</h1>
-            <p>Extract and download videos from websites with advanced scraping capabilities</p>
-        </div>
-
-        <div class="input-section">
-            <div class="input-group">
-                <input type="text" id="video-url-input" class="input-field" placeholder="Enter video URL or website URL to scrape...">
-                <button id="add-url-button" class="btn btn-primary">Add URL</button>
-                <button id="scrape-button" class="btn btn-secondary">🔍 Scrape Website</button>
-            </div>
-            
-            <div class="options-section">
-                <div class="checkbox-group">
-                    <input type="checkbox" id="auto-detect-videos" checked>
-                    <label for="auto-detect-videos">Auto-detect video formats</label>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="include-embedded" checked>
-                    <label for="include-embedded">Include embedded videos</label>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="check-availability">
-                    <label for="check-availability">Check URL availability</label>
-                </div>
-            </div>
-        </div>
-
-        <div class="status-section" id="status-section" style="display: none;">
-            <div id="status-messages"></div>
-            <div class="progress-bar" id="progress-container" style="display: none;">
-                <div class="progress-fill" id="progress-fill"></div>
-            </div>
-        </div>
-
-        <div class="video-list-section">
-            <div class="controls">
-                <button id="download-selected-button" class="btn btn-success">⬇️ Download Selected</button>
-                <button id="select-all-button" class="btn btn-secondary">✅ Select All</button>
-                <button id="clear-all-button" class="btn btn-danger">🗑️ Clear All</button>
-                <button id="export-list-button" class="btn btn-info">📤 Export List</button>
-            </div>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Video URL</th>
-                            <th>Format</th>
-                            <th>Source</th>
-                            <th>Select</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="video-list-body">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
             // Get references to DOM elements
             const videoUrlInput = document.getElementById('video-url-input');
             const addUrlButton = document.getElementById('add-url-button');
@@ -466,36 +97,78 @@
             }
 
             async function checkUrlAvailability(url) {
+                if (!document.getElementById('check-availability').checked) {
+                    return true; // Skip check if option is disabled
+                }
+                
                 try {
-                    const response = await fetch(url, { method: 'HEAD' });
-                    return response.ok;
+                    // Use no-cors mode to avoid CORS issues, but this limits what we can check
+                    const response = await fetch(url, { 
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    });
+                    // With no-cors, we can't check response.ok, so assume it worked if no error
+                    return true;
                 } catch (error) {
-                    return false;
+                    // If HEAD fails, try GET with no-cors
+                    try {
+                        await fetch(url, { 
+                            method: 'GET',
+                            mode: 'no-cors'
+                        });
+                        return true;
+                    } catch (getError) {
+                        console.warn(`URL availability check failed for ${url}:`, getError);
+                        return false;
+                    }
                 }
             }
 
             async function scrapeWebsiteForVideos(url) {
                 try {
-                    showStatus(`Scraping ${url} for videos...`, 'info');
+                    showStatus(`Attempting to scrape ${url} for videos...`, 'info');
                     updateProgress(10);
 
-                    // For demonstration purposes, we'll simulate scraping
-                    // In a real implementation, you'd need a backend service for CORS
-                    const response = await fetch(url).catch(() => null);
+                    // Try to fetch with no-cors mode for some cases
+                    let response = null;
+                    let html = '';
                     
-                    if (!response) {
-                        // Simulate finding videos based on common patterns
-                        return simulateVideoScraping(url);
+                    try {
+                        // First try normal fetch
+                        response = await fetch(url, {
+                            method: 'GET',
+                            mode: 'cors'
+                        });
+                        
+                        if (response.ok) {
+                            html = await response.text();
+                            updateProgress(50);
+                        }
+                    } catch (corsError) {
+                        // If CORS fails, try no-cors (limited functionality)
+                        try {
+                            response = await fetch(url, {
+                                method: 'GET',
+                                mode: 'no-cors'
+                            });
+                            showStatus('Limited scraping due to CORS restrictions - trying alternative methods', 'info');
+                        } catch (noCorsError) {
+                            throw new Error('Cannot access website due to CORS policy');
+                        }
                     }
 
-                    const html = await response.text();
-                    updateProgress(50);
+                    if (!html) {
+                        // If we can't get HTML content, provide helpful alternatives
+                        showStatus('Cannot directly scrape due to CORS policy. Try these alternatives:', 'error');
+                        return provideScrapingAlternatives(url);
+                    }
 
                     const foundVideos = [];
                     
                     // Extract videos using various patterns
                     advancedVideoPatterns.forEach(pattern => {
                         let match;
+                        pattern.lastIndex = 0; // Reset regex state
                         while ((match = pattern.exec(html)) !== null) {
                             const videoUrl = match[1] || match[0];
                             if (isValidUrl(videoUrl) && !foundVideos.includes(videoUrl)) {
@@ -511,6 +184,7 @@
                     let videoMatch;
                     while ((videoMatch = videoTagPattern.exec(html)) !== null) {
                         let srcMatch;
+                        srcPattern.lastIndex = 0; // Reset regex state
                         while ((srcMatch = srcPattern.exec(videoMatch[0])) !== null) {
                             const videoUrl = srcMatch[1];
                             if (isValidUrl(videoUrl) && !foundVideos.includes(videoUrl)) {
@@ -520,27 +194,66 @@
                     }
 
                     updateProgress(100);
+                    
+                    if (foundVideos.length > 0) {
+                        showStatus(`Successfully found ${foundVideos.length} videos!`, 'success');
+                    } else {
+                        showStatus('No videos found in the scraped content', 'error');
+                        return provideScrapingAlternatives(url);
+                    }
+                    
                     return foundVideos;
 
                 } catch (error) {
-                    showStatus(`Error scraping website: ${error.message}`, 'error');
-                    return simulateVideoScraping(url);
+                    showStatus(`Scraping failed: ${error.message}`, 'error');
+                    updateProgress(0);
+                    return provideScrapingAlternatives(url);
                 }
             }
 
-            function simulateVideoScraping(url) {
-                // Simulate finding videos for demo purposes
-                const simulatedVideos = [];
-                const domain = new URL(url).hostname;
+            function provideScrapingAlternatives(url) {
+                const domain = new URL(url).hostname.toLowerCase();
+                const alternatives = [];
                 
-                // Generate some example video URLs based on the domain
-                const extensions = ['mp4', 'webm', 'm3u8'];
-                extensions.forEach((ext, index) => {
-                    simulatedVideos.push(`https://${domain}/videos/sample${index + 1}.${ext}`);
-                });
-
-                showStatus(`Found ${simulatedVideos.length} potential video URLs from ${domain}`, 'success');
-                return simulatedVideos;
+                // Provide helpful suggestions based on the domain
+                if (domain.includes('youtube')) {
+                    alternatives.push({
+                        message: "For YouTube videos, use browser extensions like 'Video DownloadHelper' or online tools",
+                        urls: []
+                    });
+                } else if (domain.includes('vimeo')) {
+                    alternatives.push({
+                        message: "For Vimeo videos, check if download is enabled by the creator",
+                        urls: []
+                    });
+                } else if (domain.includes('twitter') || domain.includes('x.com')) {
+                    alternatives.push({
+                        message: "For Twitter/X videos, try online Twitter video downloaders",
+                        urls: []
+                    });
+                } else {
+                    // For other sites, suggest manual inspection
+                    showStatus(`CORS blocked direct scraping. Try these manual methods:
+                    
+1. Right-click on the page → Inspect Element
+2. Go to Network tab and reload the page
+3. Filter by Media/XHR to find video URLs
+4. Look for .mp4, .m3u8, .webm files
+5. Copy those URLs and paste them here manually`, 'info');
+                    
+                    // Try to guess common video URL patterns for the domain
+                    const extensions = ['mp4', 'webm', 'm3u8', 'mov'];
+                    const commonPaths = ['video', 'media', 'stream', 'content'];
+                    
+                    extensions.forEach(ext => {
+                        commonPaths.forEach(path => {
+                            alternatives.push(`https://${domain}/${path}/video.${ext}`);
+                            alternatives.push(`https://${domain}/uploads/video.${ext}`);
+                        });
+                    });
+                }
+                
+                return alternatives.urls || [];
             }
 
             function addVideoToList(url, source = 'manual', platform = null) {
@@ -611,25 +324,84 @@
             async function fetchM3U8Info(url) {
                 try {
                     showStatus('Fetching M3U8 playlist info...', 'info');
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    
+                    let response;
+                    try {
+                        // Try CORS first
+                        response = await fetch(url, { mode: 'cors' });
+                    } catch (corsError) {
+                        // If CORS fails, inform user about limitations
+                        showStatus('Cannot fetch M3U8 info due to CORS restrictions. The playlist might still be downloadable.', 'error');
+                        return;
+                    }
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
                     
                     const data = await response.text();
                     const lines = data.split('\n').filter(line => line.trim());
                     
                     let info = `M3U8 Playlist Info:\n\n`;
                     info += `Total lines: ${lines.length}\n`;
-                    info += `Version: ${lines.find(l => l.includes('#EXT-X-VERSION:'))?.split(':')[1] || 'Unknown'}\n`;
-                    info += `Target duration: ${lines.find(l => l.includes('#EXT-X-TARGETDURATION:'))?.split(':')[1] || 'Unknown'}\n`;
                     
-                    const segments = lines.filter(l => l.endsWith('.ts') || l.endsWith('.m4s')).length;
-                    info += `Segments: ${segments}\n\n`;
-                    info += `Preview:\n${data.substring(0, 500)}${data.length > 500 ? '...' : ''}`;
+                    const version = lines.find(l => l.includes('#EXT-X-VERSION:'));
+                    info += `Version: ${version ? version.split(':')[1] : 'Unknown'}\n`;
                     
-                    alert(info);
-                    showStatus('M3U8 info retrieved successfully', 'success');
+                    const targetDuration = lines.find(l => l.includes('#EXT-X-TARGETDURATION:'));
+                    info += `Target duration: ${targetDuration ? targetDuration.split(':')[1] + ' seconds' : 'Unknown'}\n`;
+                    
+                    const segments = lines.filter(l => l.endsWith('.ts') || l.endsWith('.m4s') || (l.includes('.') && !l.startsWith('#'))).length;
+                    info += `Video segments: ${segments}\n`;
+                    
+                    const playlistType = lines.find(l => l.includes('#EXT-X-PLAYLIST-TYPE:'));
+                    if (playlistType) {
+                        info += `Playlist type: ${playlistType.split(':')[1]}\n`;
+                    }
+                    
+                    const endList = lines.find(l => l.includes('#EXT-X-ENDLIST'));
+                    info += `Status: ${endList ? 'Complete' : 'Live/Ongoing'}\n`;
+                    
+                    info += `\nPreview (first 500 characters):\n`;
+                    info += data.substring(0, 500);
+                    if (data.length > 500) info += '\n...';
+                    
+                    // Create a modal-like alert with better formatting
+                    const userConfirm = confirm(info + '\n\nWould you like to copy the full playlist content to clipboard?');
+                    
+                    if (userConfirm) {
+                        try {
+                            await navigator.clipboard.writeText(data);
+                            showStatus('M3U8 content copied to clipboard!', 'success');
+                        } catch (clipboardError) {
+                            // Fallback for older browsers
+                            const textArea = document.createElement('textarea');
+                            textArea.value = data;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            showStatus('M3U8 content copied to clipboard (fallback method)', 'success');
+                        }
+                    } else {
+                        showStatus('M3U8 info retrieved successfully', 'success');
+                    }
                 } catch (error) {
-                    showStatus(`Failed to fetch M3U8 info: ${error.message}`, 'error');
+                    const errorMessage = `Failed to fetch M3U8 info: ${error.message}`;
+                    showStatus(errorMessage, 'error');
+                    
+                    // Provide helpful information even when fetch fails
+                    const helpText = `
+M3U8 Info Unavailable Due to Network/CORS Restrictions
+
+However, you can still try to download this M3U8 playlist:
+• Right-click the download button and "Save link as..."
+• Use external tools like ffmpeg: ffmpeg -i "${url}" output.mp4
+• Use browser extensions designed for M3U8 downloads
+
+URL: ${url}`;
+                    
+                    alert(helpText);
                 }
             }
 
@@ -652,7 +424,7 @@
             }
 
             // Event Listeners
-            addUrlButton.addEventListener('click', () => {
+            addUrlButton.addEventListener('click', async () => {
                 const url = videoUrlInput.value.trim();
                 
                 if (!url) {
@@ -663,6 +435,17 @@
                 if (!isValidUrl(url)) {
                     showStatus('Please enter a valid URL', 'error');
                     return;
+                }
+
+                // Check availability if option is enabled
+                if (document.getElementById('check-availability').checked) {
+                    showStatus('Checking URL availability...', 'info');
+                    const isAvailable = await checkUrlAvailability(url);
+                    if (!isAvailable) {
+                        showStatus('Warning: URL may not be accessible', 'error');
+                        const proceed = confirm('The URL may not be accessible. Do you want to add it anyway?');
+                        if (!proceed) return;
+                    }
                 }
 
                 addVideoToList(url, 'manual');
@@ -683,20 +466,39 @@
                     return;
                 }
 
-                const videos = await scrapeWebsiteForVideos(url);
-                
-                videos.forEach(videoUrl => {
-                    addVideoToList(videoUrl, 'scraped');
-                });
+                // Disable button during scraping
+                scrapeButton.disabled = true;
+                scrapeButton.textContent = '🔄 Scraping...';
 
-                if (videos.length === 0) {
-                    showStatus('No videos found on the website', 'error');
-                } else {
-                    showStatus(`Successfully scraped ${videos.length} videos`, 'success');
+                try {
+                    const videos = await scrapeWebsiteForVideos(url);
+                    
+                    if (videos && videos.length > 0) {
+                        let addedCount = 0;
+                        videos.forEach(videoUrl => {
+                            if (videoUrl && isValidUrl(videoUrl)) {
+                                addVideoToList(videoUrl, 'scraped');
+                                addedCount++;
+                            }
+                        });
+
+                        if (addedCount === 0) {
+                            showStatus('No valid video URLs were found', 'error');
+                        } else {
+                            showStatus(`Successfully added ${addedCount} videos from scraping`, 'success');
+                        }
+                    } else {
+                        showStatus('No videos found. Try manual inspection or direct video URLs.', 'error');
+                    }
+                } catch (error) {
+                    showStatus(`Scraping error: ${error.message}`, 'error');
+                } finally {
+                    // Re-enable button
+                    scrapeButton.disabled = false;
+                    scrapeButton.textContent = '🔍 Scrape Website';
+                    videoUrlInput.value = '';
+                    updateProgress(0);
                 }
-
-                videoUrlInput.value = '';
-                updateProgress(0);
             });
 
             downloadSelectedButton.addEventListener('click', () => {
