@@ -3,83 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Static Video Link Downloader</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Enhanced Video Downloader</title>
 </head>
 <body>
-    <header>
-        <h1>Static Video Link Downloader</h1>
-    </header>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 Enhanced Video Downloader</h1>
+            <p>Extract and download videos from websites with advanced scraping capabilities</p>
+        </div>
 
-    <main>
-        <section id="input-area">
-            <h2>Add Video URL</h2>
-            <input type="text" id="video-url-input" placeholder="Paste video URL here">
-            <button id="add-url-button">Add URL</button>
-        </section>
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="video-url-input" class="input-field" placeholder="Enter video URL or website URL to scrape...">
+                <button id="add-url-button" class="btn btn-primary">Add URL</button>
+                <button id="scrape-button" class="btn btn-secondary">🔍 Scrape Website</button>
+            </div>
+            
+            <div class="options-section">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="auto-detect-videos" checked>
+                    <label for="auto-detect-videos">Auto-detect video formats</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="include-embedded" checked>
+                    <label for="include-embedded">Include embedded videos</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="check-availability">
+                    <label for="check-availability">Check URL availability</label>
+                </div>
+            </div>
+        </div>
 
-        <section id="video-list-area">
-            <h2>Video List</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Video URL</th>
-                        <th>Select</th>
-                        <th>Action</th>
-                        <th>Details</th>
-                    </tr>
-                </thead>
-                <tbody id="video-list-body">
-                    <!-- Video entries will be added here by JavaScript -->
-                </tbody>
-            </table>
-        </section>
+        <div class="status-section" id="status-section" style="display: none;">
+            <div id="status-messages"></div>
+            <div class="progress-bar" id="progress-container" style="display: none;">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
 
-        <section id="controls-area">
-            <h2>Batch Actions</h2>
-            <button id="download-selected-button">Download Selected</button>
-            <button id="clear-all-button">Clear All</button>
-        </section>
+        <div class="video-list-section">
+            <div class="controls">
+                <button id="download-selected-button" class="btn btn-success">⬇️ Download Selected</button>
+                <button id="select-all-button" class="btn btn-secondary">✅ Select All</button>
+                <button id="clear-all-button" class="btn btn-danger">🗑️ Clear All</button>
+                <button id="export-list-button" class="btn btn-info">📤 Export List</button>
+            </div>
 
-        <section id="instructions-area">
-            <h2>Instructions & Limitations</h2>
-            <h3>Instructions:</h3>
-            <ul>
-                <li>
-                    <strong>Obtain Video Link:</strong> Manually find the direct link to the video file (e.g., a URL ending in <code>.mp4</code>, <code>.webm</code>) or an M3U8 playlist URL (ending in <code>.m3u8</code>).
-                    <ul>
-                        <li><em>Important:</em> This tool <strong>cannot</strong> automatically scrape or extract video links from websites like YouTube, Twitter, AnimePahe, etc., due to web security restrictions (e.g., CORS). You must find the link yourself, often by inspecting network requests in your browser's developer tools or from sites that provide direct links.</li>
-                    </ul>
-                </li>
-                <li><strong>Paste Link:</strong> Paste the obtained URL into the "Add Video URL" input field.</li>
-                <li><strong>Add to List:</strong> Click the "Add URL" button. The URL will appear in the list below.</li>
-                <li>
-                    <strong>Download:</strong>
-                    <ul>
-                        <li><em>Individual:</em> Click the "Download" button in the row of the video you want.</li>
-                        <li><em>Selected:</em> Check the boxes next to multiple videos and click "Download Selected".</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>M3U8 Info (Optional):</strong> If you add an M3U8 link, an "Info" button will appear. Clicking it may show some basic information from the playlist file if the hosting server allows (often blocked by CORS policy). This does <em>not</em> download the video segments or assemble the video.
-                </li>
-            </ul>
-
-            <h3>Limitations:</h3>
-            <ul>
-                <li><strong>No Website Scraping:</strong> This tool does not scrape websites. You <em>must</em> provide direct media URLs.</li>
-                <li><strong>M3U8 Downloading:</strong> For <code>.m3u8</code> URLs, this tool only downloads the <code>.m3u8</code> playlist file itself, <strong>not</strong> the full video. Assembling M3U8 streams requires specialized software (like VLC, ffmpeg, or dedicated download managers) not available in a browser-based static page.</li>
-                <li><strong>Download Failures:</strong> Downloads may fail if the provided URL is incorrect, expired, or if the server hosting the file has restrictions (e.g., hotlink protection, CORS issues for the M3U8 info feature).</li>
-                <li><strong>Batch Downloads:</strong> Batch downloads will trigger multiple separate file downloads in your browser. Your browser might ask for confirmation for each download or block too many simultaneous downloads. Adjust your browser settings if needed.</li>
-                <li><strong>No Video Conversion/Processing:</strong> This tool does not convert, re-encode, or otherwise process video files. It only facilitates the download of the provided link.</li>
-            </ul>
-        </section>
-    </main>
-
-    <footer>
-        <!-- Footer content can be added later -->
-    </footer>
-
-    <script src="script.js" defer></script>
-</body>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Video URL</th>
+                            <th>Format</th>
+                            <th>Source</th>
+                            <th>Select</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="video-list-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </body>
 </html>
